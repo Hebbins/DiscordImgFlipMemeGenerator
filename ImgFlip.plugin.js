@@ -2,7 +2,7 @@
  * @name ImgFlipMemeGenerator
  * @author Hebbins
  * @description Search and generate memes from ImgFlip directly in Discord
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 module.exports = meta => {
@@ -30,7 +30,6 @@ module.exports = meta => {
             const panel = document.createElement("div");
             panel.className = "imgflip-settings";
             panel.innerHTML = `
-                <h3>ImgFlip Meme Generator Settings</h3>
                 <div class="setting-item">
                     <label>Max results to show: </label>
                     <input type="number" id="imgflip-max-results" min="10" max="100" value="${this.settings.maxResults}">
@@ -129,10 +128,10 @@ module.exports = meta => {
                 .imgflip-settings { color: var(--header-primary); margin: 10px; }
                 .imgflip-settings .setting-item { margin: 10px 0; display: flex; align-items: center; justify-content: space-between; }
                 .imgflip-settings input { background-color: var(--background-tertiary); border: none; color: var(--text-normal); padding: 8px; border-radius: 4px; width: 260px; max-width: 100%; box-sizing: border-box; }
-                * { scrollbar-width: thin; scrollbar-color: #1a1b1e #2b2d31; }
-                *::-webkit-scrollbar { width: 8px; background: #2b2d31; }
-                *::-webkit-scrollbar-thumb { background: #1a1b1e; border-radius: 8px; border: 2px solid #2b2d31; }
-                *::-webkit-scrollbar-track { background: #2b2d31; border-radius: 8px; }
+                .imgflip-content { scrollbar-width: thin; scrollbar-color: #1a1b1e #2b2d31; }
+                .imgflip-content::-webkit-scrollbar { width: 8px; background: #2b2d31; }
+                .imgflip-content::-webkit-scrollbar-thumb { background: #1a1b1e; border-radius: 8px; border: 2px solid #2b2d31; }
+                .imgflip-content::-webkit-scrollbar-track { background: #2b2d31; border-radius: 8px; }
             `);
         },
 
