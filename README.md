@@ -1,6 +1,6 @@
 # ImgFlip BetterDiscord Plugin
 
-Generate and send ImgFlip memes on the fly.
+Generate and send ImgFlip memes on the fly within Discord
 <hr />
 
 ## Before you start
