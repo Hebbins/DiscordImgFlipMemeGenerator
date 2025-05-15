@@ -2,7 +2,7 @@
  * @name ImgFlipMemeGenerator
  * @author Hebbins
  * @description Search and generate memes from ImgFlip directly in Discord
- * @version 1.2.1
+ * @version 1.0.1
  */
 
 module.exports = meta => {
