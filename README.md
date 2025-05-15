@@ -10,7 +10,7 @@ Once the plugin is enabled, you will need to create an ImgFlip account
 for use of their API. You can choose to go with a Premium account for
 access to more templates, or just stay with the free account for access
 to free templates.  
-![image](/assets//settings.png)
+![image](/assets/settings.png)
 
 Please keep in mind that your ImgFlip password is stored locally, so
 please set it to something that isn't used elsewhere (your bank, social
@@ -20,7 +20,7 @@ media... Discord account)
 ## Generating a meme
 
 Select the meme editor icon from the textbox  
-![image](assets/icon)
+![image](assets/icon.png)
 
 Search for a meme template  
 ![image](assets/search.png)
