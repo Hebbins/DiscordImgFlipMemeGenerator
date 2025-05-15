@@ -2,7 +2,7 @@
  * @name ImgFlipMemeGenerator
  * @author Hebbins
  * @description Search and generate memes from ImgFlip directly in Discord
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 module.exports = meta => {
@@ -40,10 +40,10 @@ module.exports = meta => {
                 </div>
                 <div class="setting-item">
                     <label>ImgFlip Password: </label>
-                    <input type="password" id="imgflip-password" placeholder="Your ImgFlip password" value="${this.settings.password || ""}">
+                    <input type="password" id="imgflip-password" placeholder="Update your ImgFlip Password" value=""}">
                 </div>
                 <div style="margin:8px 0 0 0; color:var(--text-muted); font-size:13px;">
-                    If you don't have credentials, <a href="https://imgflip.com/signup" target="_blank" style="color:var(--brand-experiment);text-decoration:underline;">sign up here</a>.
+                    If you don't have credentials, <a href="https://imgflip.com/signup" target="_blank" style="color:var(--brand-experiment);text-decoration:underline;">sign up here</a>.<br>
                 </div>
             `;
 
@@ -65,7 +65,7 @@ module.exports = meta => {
                 const passwordInput = panel.querySelector("#imgflip-password");
                 if (passwordInput) {
                     passwordInput.addEventListener("input", () => {
-                        this.settings.password = passwordInput.value;
+                        this.settings.encryptedPassword = this.encryptPassword(passwordInput.value);
                         this.saveSettings();
                     });
                 }
@@ -78,7 +78,7 @@ module.exports = meta => {
             const defaultSettings = {
                 maxResults: 50,
                 username: "",
-                password: ""
+                encryptedPassword: ""
             };
             const loadedSettings = BdApi.Data.load("ImgFlipMemeGenerator", "settings");
             return {...defaultSettings, ...loadedSettings };
@@ -96,6 +96,39 @@ module.exports = meta => {
             this.fetchMemes();
             BdApi.UI.showToast("ImgFlip Meme Generator loaded", { type: "success" });
             this.initialized = true;
+        },
+
+        encryptPassword(password) {
+            if (!password) return "";
+            try {
+                const key = "ImgFlipMemeGen" + navigator.userAgent.slice(0, 10);
+                return btoa(
+                    password
+                        .split("")
+                        .map((char, idx) => 
+                            String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(idx % key.length))
+                        )
+                        .join("")
+                );
+            } catch (e) {
+                return "";
+            }
+        },
+
+        decryptPassword(encrypted) {
+            if (!encrypted) return "";
+            try {
+                const key = "ImgFlipMemeGen" + navigator.userAgent.slice(0, 10);
+                const decoded = atob(encrypted);
+                return decoded
+                    .split("")
+                    .map((char, idx) => 
+                        String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(idx % key.length))
+                    )
+                    .join("");
+            } catch (e) {
+                return "";
+            }
         },
 
         loadStylesheet() {
@@ -249,11 +282,13 @@ module.exports = meta => {
                         this.memeCache = data.data.memes;
                         if (this.popupOpen) this.displayMemes(this.memeCache);
                     } else {
-                        // API returned success: false, could potentially log this or show toast if helpful
+                        if (this.popupOpen) {
+                            const content = this.popup.querySelector('.imgflip-content');
+                            content.innerHTML = '<div class="imgflip-no-results">Failed to load memes. Please try again.</div>';
+                        }
                     }
                 })
                 .catch(error => {
-                    // Error fetching, could potentially log this or show toast if helpful
                     if (this.popupOpen) {
                         const content = this.popup.querySelector('.imgflip-content');
                         content.innerHTML = '<div class="imgflip-no-results">Failed to load memes. Please try again.</div>';
@@ -360,7 +395,7 @@ module.exports = meta => {
                 const params = new URLSearchParams();
                 params.append('template_id', memeId);
                 params.append('username', this.settings.username || '');
-                params.append('password', this.settings.password || '');
+                params.append('password', this.decryptPassword(this.settings.encryptedPassword) || '');
                 boxes.forEach((text, i) => params.append(`boxes[${i}][text]`, text));
 
                 const response = await fetch('https://api.imgflip.com/caption_image', {
@@ -395,28 +430,13 @@ module.exports = meta => {
             }, 100);
         },
 
-        previewMeme(memeEditorElement) {
-            if (!this.currentMeme) return;
-            const textInputs = memeEditorElement.querySelectorAll('.imgflip-text-input');
-            const boxes = Array.from(textInputs).map(input => input.value);
-            const memeId = this.currentMeme.id;
-            const params = new URLSearchParams();
-            params.append('template_id', memeId);
-            params.append('username', this.settings.username || '');
-            params.append('password', this.settings.password || '');
-            boxes.forEach((text, i) => params.append(`boxes[${i}][text]`, text));
-            const previewUrl = `https://api.imgflip.com/caption_image?${params.toString()}`;
-            const imgPreview = memeEditorElement.querySelector('.imgflip-meme-preview');
-            if (imgPreview) imgPreview.src = previewUrl;
-        },
-
         generateAndInsertMeme() {
             if (!this.currentMeme) return;
             const textInputs = this.popup.querySelectorAll('.imgflip-text-input');
             const formData = new FormData();
             formData.append('template_id', this.currentMeme.id);
             formData.append('username', this.settings.username || '');
-            formData.append('password', this.settings.password || '');
+            formData.append('password', this.decryptPassword(this.settings.encryptedPassword) || '');
             textInputs.forEach((input, index) => {
                 formData.append(`boxes[${index}][text]`, input.value.trim() || '');
             });
