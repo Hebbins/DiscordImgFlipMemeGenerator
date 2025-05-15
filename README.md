@@ -34,4 +34,4 @@ area
 ![image](assets/textarea.png)
 
 Hit send  
-![image](assets/result)
+![image](assets/result.png)
